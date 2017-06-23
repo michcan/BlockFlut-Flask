@@ -70,3 +70,11 @@ Blockly.Python['formeonde'] = function(block) {
   }
   return code;
 };
+
+Blockly.Python['boucle_inf'] = function(block) {
+  var statements_sequence_boucle = Blockly.Python.statementToCode(block, 'sequence_boucle');
+  // TODO: Assemble Python into code variable.
+  statements_sequence_boucle = Blockly.Python.addLoopTrap(statements_sequence_boucle, block.id) || Blockly.Python.PASS;
+  var code = statements_sequence_boucle;
+  return code;
+};

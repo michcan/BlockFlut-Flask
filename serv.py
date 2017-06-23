@@ -11,6 +11,9 @@
 from flask import Flask, jsonify, render_template, request
 from pyo import *
 
+#les import ne sont pas fait par Blockly (à cause de mon code)
+from numbers import Number
+
 import time
 import signal
 import sys

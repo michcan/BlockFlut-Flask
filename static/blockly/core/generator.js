@@ -100,6 +100,7 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
     workspace = Blockly.getMainWorkspace();
   }
   var code = [];
+  this.stepInit =new Array();
   
   this.nombredepile=0;
   this.numblock=0;
@@ -108,10 +109,15 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
   
   this.init(workspace);
   var blocks = workspace.getTopBlocks(true);//retourne un tableau de tout les premiers bloc de pile
+  //console.log(blocks);
   for (var x = 0, block; block = blocks[x]; x++) {
-	this.seqs[this.nombredepile]=Array();
 	this.steps=0;
+	if(blocks[x].type=="boucle_inf" && blocks[x].getChildren().length!=0)
+		{
+		this.seqs[this.nombredepile]=Array();
+		}
     var line = this.blockToCode(block);//retourne le code de la pile commençant par le block "block"
+    //console.log(line)
     if (goog.isArray(line)) {
       // Value blocks return tuples of code and operator order.
       // Top-level blocks don't care about operator order.
@@ -123,13 +129,20 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
         // it wants to append a semicolon, or something.
         line = this.scrubNakedValue(line);
       }
-      this.nombredepile+=1;
-      code.push(line);//ajoute le code de la pile dans le tableau code
+      if(blocks[x].type=="boucle_inf" && blocks[x].getChildren().length!=0)
+		{
+		this.nombredepile+=1;
+		//console.log("pushed");
+		code.push(line);//ajoute le code de la pile dans le tableau code
+		}else if(blocks[x].getChildren().length!=0){
+			this.stepInit.push(line);
+		}
     }
   }
+  //console.log(code)
   for(var x = 0; x<code.length; x++)
   {
-	code[x]= this.prefixLines(code[x], this.INDENT);
+	//code[x]= this.prefixLines(code[x], this.INDENT);
 	code[x]="def loop"+x+"(self): \n" 
 	+ "  self.id=" + x + "\n"
 	+ code[x]
@@ -149,7 +162,8 @@ Blockly.Generator.prototype.workspaceToCode = function(workspace) {
   code = code.replace(/[ \t]+\n/g, '\n');
   //alert("Nombre total de blocks : " + Blockly.Generator.prototype.numblock);
   //alert("Nombre total de steps : " + this.steps);
-  //console.log(code);
+  console.log(code);
+  //console.log(this.stepInit);
   return code;
 };
 
@@ -233,13 +247,11 @@ Blockly.Generator.prototype.blockToCode = function(block) {
       code = this.STATEMENT_PREFIX.replace(/%1/g, '\'' + id + '\'') +
           code;
     }
-    //console.log(String(block));
-    if(block.getSurroundParent()){
-      //console.log("type : " + block.getSurroundParent().type + " et ID : " + block.getSurroundParent().id);
-    }else{
+	if(block.getSurroundParent() && block.getSurroundParent().type=="boucle_inf")
+	{
       code=
       "if self.count"+this.nombredepile+"==" + this.steps + ":\n"
-      +this.prefixLines(/** @type {string} */ (code), this.INDENT)
+      +this.prefixLines(/** @type {string} */ (code), this.INDENT);
       if (Blockly.Python.valueToCode(block, 'durée', Blockly.Python.ORDER_ATOMIC)!="") 
 		{
 			var dure=Blockly.Python.valueToCode(block, 'durée', Blockly.Python.ORDER_ATOMIC)
@@ -248,6 +260,8 @@ Blockly.Generator.prototype.blockToCode = function(block) {
 			this.seqs[this.nombredepile][this.steps]=0;
         }
       this.steps+=1;
+      //console.log(this.scrub_(block, code))
+      //console.log("type : " + block.getSurroundParent().type + " et ID : " + block.getSurroundParent().id);
     }
     return this.scrub_(block, code);
   } else if (code === null) {

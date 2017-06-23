@@ -17,29 +17,38 @@ scale1 = TableScale(presawTable, sawTable, mul=0.08)
 scale2 = TableScale(presquareTable, squareTable, mul=0.08)
 sinTable = HarmTable([0.08])
 
-seqTable=[]
-oscTable=[None]*10
-oscTable[0]="gagag"
+from numbers import Number
 
 try:
-  del seqTable[:]
-  del oscTable[:]
+  step.destroy()
   del step
 except:
   pass
 
 class Steps():
   def __init__(self):
-    seqTable.append(TrigFunc(Seq(time=0.001,seq=[500]).play(),self.loop0))
+    self.oscTable=[None]*10
+    self.seqTable=[]
+    self._C3_A9l_C3_A9ment = 0
+    self._C3_A9l_C3_A9ment = 40
+    self._C3_A9l_C3_A9ment = (self._C3_A9l_C3_A9ment if isinstance(self._C3_A9l_C3_A9ment, Number) else 0) + 1
     self.count0=0
+    self.seqTable.append(TrigFunc(Seq(time=0.001,seq=[500]).play(),self.loop0))
+
+  def destroy(self):
+    del self.seqTable[:]
+    del self.oscTable[:]
 
   def loop0(self):
     self.id=0
-    global oscTable
     if self.count0==0:
-      print oscTable[0]
+      if self.oscTable[1]==None:
+        self.oscTable[1]=Osc(sinTable).out()
+        self.oscTable[1].ramp=SigTo(value=0.5,time=0.1)
+        self.oscTable[1].mul=self.oscTable[1].ramp
+      self.oscTable[1].freq=((2**(((self._C3_A9l_C3_A9ment*1.0)-69)/12))*440)
     self.count0+=1
-    if self.count0>=len(seqTable[0].input.seq):
+    if self.count0>=len(self.seqTable[0].input.seq):
       self.count0=0
 
 step=Steps()

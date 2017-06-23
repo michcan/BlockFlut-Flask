@@ -2,6 +2,7 @@
 <head>
 <meta charset="utf-8">
 <title>BlockFlut0</title>
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 <script src="/static/blockly/blockly_uncompressed.js"></script>
 <script src="/static/blockly/blocks/logic.js"></script>
 <script src="/static/blockly/blocks/variables.js"></script>
@@ -27,6 +28,9 @@
 <div id="blocklyDiv" style="height: 560px; width: 1000px;"></div>
 <xml id="toolbox" style="display: none">
 <category name="Sons" color="180">
+<block type="boucle_inf">
+</block>
+
 <block type="pitchtofrequ">
    <value name="NAME">
       <shadow type="math_number">
@@ -113,7 +117,9 @@ var workspace = Blockly.inject('blocklyDiv',
 {
 	toolbox: document.getElementById('toolbox'),
 	scrollbars: true,
-	sounds:false
+	sounds:false,
+	zoom:{startScale:0.8},
+	media: '/static/blockly/media/'
 });
 /*
 $('#exec').bind('click', function() {
@@ -176,7 +182,6 @@ function checkandlaunch(){
 	//console.log("nbventList :"+nbeventlist);
 }
 
-	var pid;
 	function load(){
 	  //console.log(Blockly.Python.workspaceToCode(workspace))
       $.getJSON($SCRIPT_ROOT + '/_play', {
@@ -188,6 +193,8 @@ function checkandlaunch(){
       });
       return false;
     }
+    
+    $('#exec').bind('click', function(){load();});
 
     $('#stop').bind('click', function() {
       $.getJSON($SCRIPT_ROOT + '/_stop', {

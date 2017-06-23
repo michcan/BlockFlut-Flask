@@ -182,11 +182,7 @@ Blockly.Python.finish = function(code) {
   var imports = [];
   var definitions = [];
   var SeqVar;
-  var ClassInit=
-  "class Steps(): \n" +
-  "  def __init__(self):"+"\n"+
-  "    self.oscTable=[None]*10"+"\n"+
-  "    self.seqTable=[]";
+  var extraInit = this.stepInit.join('\n');
   //alert(Blockly.Python.definitions_);
   for (var name in Blockly.Python.definitions_) {
     var def = Blockly.Python.definitions_[name];
@@ -202,14 +198,23 @@ Blockly.Python.finish = function(code) {
   Blockly.Python.variableDB_.reset();
   var Imports = imports.join('\n') + '\n\n';
   var Declares = this.prefixLines(definitions.join('\n'),this.INDENT+this.INDENT) + '\n';
-  //alert(Declares);
-  ClassInit+=Declares;
+  //console.log(this.stepInit.join('\n'));
+  var ClassInit=
+  "class Steps(): \n" +
+  "  def __init__(self):"+"\n"+
+  "    self.oscTable=[None]*10"+"\n"+
+  "    self.seqTable=[]"+"\n"+
+  Declares;
+  if(extraInit!="")
+  {
+	  ClassInit+=this.prefixLines(extraInit,this.INDENT+this.INDENT);
+  }
   for(var x = 0; x<this.seqs.length; x++)
   {
 	SeqVar =
 	"self.count"+x+"=0"+"\n"+
 	"self.seqTable.append(TrigFunc(Seq(time=0.001,seq=["+this.seqs[x].join(',')+"]).play(),self.loop"+x+"))"+"\n";
-    ClassInit+=this.prefixLines(SeqVar, this.INDENT+this.INDENT);
+	ClassInit+=this.prefixLines(SeqVar,this.INDENT+this.INDENT);
   }
   ClassInit+="\n"+
   "  def destroy(self):"+"\n"+
@@ -217,8 +222,8 @@ Blockly.Python.finish = function(code) {
   "    del self.oscTable[:]"+"\n\n";
   //var allDefs = imports.join('\n') + '\n\n' + definitions.join('\n\n');
   //return allDefs.replace(/\n\n+/g, '\n\n').replace(/\n*$/, '\n\n\n') + Blockly.Python.LaunchPyoServ + Blockly.Python.HardCodeDef + code + "\ntime.sleep(20) ";
-  return Imports 
-  + Blockly.Python.Destroy + '\n' + ClassInit + this.prefixLines(code, this.INDENT) + "\n";
+  // Attention les import doivent être mis manuellement dans le serv.py
+  return Blockly.Python.Destroy + '\n' + ClassInit + this.prefixLines(code, this.INDENT) + "\n";
 };
 
 /**

@@ -109,3 +109,18 @@ Blockly.Blocks['attendre'] = {
     this.setHelpUrl('http://www.example.com/');
   }
 };
+
+Blockly.Blocks['boucle_inf'] = {
+  init: function() {
+    this.appendDummyInput()
+		.setAlign(Blockly.ALIGN_CENTRE)
+        .appendField(new Blockly.FieldImage("/static/blockly/media/boucle2.png", 50, 70, "<->"))
+        .appendField("               ");
+    this.appendStatementInput("sequence_boucle")
+        .setCheck(null);
+    this.setColour(65);
+    this.setTooltip('');
+    this.setHelpUrl('http://www.example.com/');
+    Blockly.BlockSvg.START_HAT=true;
+  }
+};
